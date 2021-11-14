@@ -1,0 +1,50 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "FizzBuzz Service",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/": {
+      "post": {
+        "summary": "FizzBuzz answer for input",
+        "description": "Returns FizzBuzz answer for input",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "string",
+                "example": "15"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/x-www-form-urlencoded": {
+                "schema": {
+                  "type": "string",
+                  "example": "\"FizzBuzz\""
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request body malformed"
+          },
+          "502": {
+            "description": "Oracle API unavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {}
+}
