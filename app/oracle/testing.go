@@ -1,4 +1,4 @@
-package fizzbuzz
+package oracle
 
 import (
 	"net/http"
@@ -11,7 +11,7 @@ import (
 func TestOracle(t *testing.T) (*Oracle, *http.ServeMux, func()) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
-	oracle := NewOracle(OracleOptions{
+	oracle := NewOracle(Options{
 		BaseUrl: server.URL,
 		Timeout: 100 * time.Millisecond,
 	})

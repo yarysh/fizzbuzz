@@ -1,4 +1,4 @@
-package fizzbuzz
+package oracle
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func TestOracle_Predict(t *testing.T) {
+func TestOracle_FizzBuzz(t *testing.T) {
 	oracle, mux, teardown := TestOracle(t)
 	defer teardown()
 
@@ -35,13 +35,13 @@ func TestOracle_Predict(t *testing.T) {
 		15: "FizzBuzz",
 	}
 	for n, want := range tc {
-		if got, _ := oracle.Predict(n); got != want {
-			t.Errorf("Predict(%d) = %s, want %s", n, got, want)
+		if got, _ := oracle.FizzBuzz(n); got != want {
+			t.Errorf("FizzBuzz(%d) = %s, want %s", n, got, want)
 		}
 	}
 }
 
-func TestOracle_Predict_bad_response(t *testing.T) {
+func TestOracle_FizzBuzz_bad_response(t *testing.T) {
 	oracle, mux, teardown := TestOracle(t)
 	defer teardown()
 
@@ -49,14 +49,14 @@ func TestOracle_Predict_bad_response(t *testing.T) {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, "Internal Server Error")
 	})
-	_, err := oracle.Predict(1)
+	_, err := oracle.FizzBuzz(1)
 	want := "unexpected response: 500 Internal Server Error"
 	if err.Error() != want {
 		t.Errorf("expected error %q, got %q", want, err.Error())
 	}
 }
 
-func TestOracle_Predict_timeout(t *testing.T) {
+func TestOracle_FizzBuzz_timeout(t *testing.T) {
 	oracle, mux, teardown := TestOracle(t)
 	defer teardown()
 
@@ -65,20 +65,20 @@ func TestOracle_Predict_timeout(t *testing.T) {
 		fmt.Fprint(w, "Fizz")
 	})
 
-	_, err := oracle.Predict(1)
+	_, err := oracle.FizzBuzz(1)
 	if !strings.Contains(err.Error(), "Client.Timeout exceeded") {
 		t.Errorf("expected timeout error, got %v", err)
 	}
 }
 
-func TestOracle_Predict_unknown_result(t *testing.T) {
+func TestOracle_FizzBuzz_unknown_result(t *testing.T) {
 	oracle, mux, teardown := TestOracle(t)
 	defer teardown()
 
 	mux.HandleFunc("/predict", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Fizz1")
 	})
-	_, err := oracle.Predict(1)
+	_, err := oracle.FizzBuzz(1)
 	want := "unexpected result: Fizz1"
 	if err.Error() != want {
 		t.Errorf("expected error: %s, got: %v", want, err)

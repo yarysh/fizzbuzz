@@ -28,7 +28,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			defer func() {
 				if err := recover(); err != nil {
 					w.WriteHeader(http.StatusInternalServerError)
-					w.Write([]byte(`Internal server error`))
+					w.Write([]byte("Internal server error"))
 				}
 			}()
 			next.ServeHTTP(w, r)

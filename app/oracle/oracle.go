@@ -1,7 +1,8 @@
-package fizzbuzz
+package oracle
 
 import (
 	"fmt"
+	"github.com/yarysh/fizzbuzz/app/fizzbuzz"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -9,19 +10,19 @@ import (
 	"time"
 )
 
-type OracleOptions struct {
+type Options struct {
 	BaseUrl string        // Base API url
 	Timeout time.Duration // Timeout for API calls
 }
 
-// Oracle - FizzBuzz prediction API
+// Oracle - prediction API
 type Oracle struct {
 	baseUrl string
 	client  *http.Client
 }
 
-// Predict returns prediction of the fizzbuzz value for a given n
-func (o *Oracle) Predict(n int64) (string, error) {
+// FizzBuzz returns prediction of the fizzbuzz value for a given n
+func (o *Oracle) FizzBuzz(n int64) (string, error) {
 	path := "predict"
 	resp, err := o.client.Post(
 		o.baseUrl+path,
@@ -43,7 +44,7 @@ func (o *Oracle) Predict(n int64) (string, error) {
 	}
 
 	result := strings.TrimSpace(string(body))
-	if result == Fizz || result == Buzz || result == FizzBuzz {
+	if result == fizzbuzz.Fizz || result == fizzbuzz.Buzz || result == fizzbuzz.FizzBuzz {
 		return result, nil
 	} else if _, err := strconv.ParseInt(result, 10, 64); err == nil {
 		return result, nil
@@ -52,7 +53,7 @@ func (o *Oracle) Predict(n int64) (string, error) {
 }
 
 // NewOracle returns a new Oracle
-func NewOracle(opts OracleOptions) *Oracle {
+func NewOracle(opts Options) *Oracle {
 	baseUrl := opts.BaseUrl
 	if !strings.HasSuffix(baseUrl, "/") {
 		baseUrl += "/"
