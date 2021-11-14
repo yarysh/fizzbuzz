@@ -18,13 +18,13 @@ func TestOracle_FizzBuzz(t *testing.T) {
 		body, _ := ioutil.ReadAll(r.Body)
 		switch string(body) {
 		case "1":
-			fmt.Fprint(w, "1")
+			fmt.Fprint(w, `"1"`)
 		case "3":
-			fmt.Fprint(w, "Fizz")
+			fmt.Fprint(w, `"Fizz"`)
 		case "5":
-			fmt.Fprint(w, "Buzz")
+			fmt.Fprint(w, `"Buzz"`)
 		case "15":
-			fmt.Fprint(w, "FizzBuzz")
+			fmt.Fprint(w, `"FizzBuzz"`)
 		}
 	})
 

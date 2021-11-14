@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+// Options for Oracle
 type Options struct {
 	BaseUrl string        // Base API url
 	Timeout time.Duration // Timeout for API calls
@@ -43,7 +44,8 @@ func (o *Oracle) FizzBuzz(n int64) (string, error) {
 		return "", err
 	}
 
-	result := strings.TrimSpace(string(body))
+	// Remove `"`, `'` and whitespaces
+	result := strings.Trim(string(body), "\"'\n")
 	if result == fizzbuzz.Fizz || result == fizzbuzz.Buzz || result == fizzbuzz.FizzBuzz {
 		return result, nil
 	} else if _, err := strconv.ParseInt(result, 10, 64); err == nil {
