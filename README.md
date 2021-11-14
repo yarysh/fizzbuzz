@@ -12,7 +12,7 @@ Service will return:
 "FizzBuzz"
 ```
 
-More info: https://app.swaggerhub.com/apis-docs/and.yarysh/FizzBuzz/1.0.0#/default/post_
+More info: https://app.swaggerhub.com/apis-docs/and.yarysh/FizzBuzz
 
 ### Makefile
 #### ```make build```
