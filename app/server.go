@@ -35,7 +35,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		})
 	}(handler)
 
-	// JSON response
+	// Set Content Type response
 	handler = func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
