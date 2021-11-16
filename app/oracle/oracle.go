@@ -3,9 +3,11 @@ package oracle
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/yarysh/fizzbuzz/app/fizzbuzz"
@@ -21,10 +23,20 @@ type Options struct {
 type Oracle struct {
 	baseUrl string
 	client  *http.Client
+	cacheMu sync.Mutex
+	cache   map[int64]string
 }
 
 // FizzBuzz returns prediction of the fizzbuzz value for a given n
 func (o *Oracle) FizzBuzz(n int64) (string, error) {
+	o.cacheMu.Lock()
+	if result, ok := o.cache[n]; ok {
+		o.cacheMu.Unlock()
+		log.Println("Get result from cache")
+		return result, nil
+	}
+	o.cacheMu.Unlock()
+
 	path := "predict"
 	resp, err := o.client.Post(
 		o.baseUrl+path,
@@ -46,10 +58,18 @@ func (o *Oracle) FizzBuzz(n int64) (string, error) {
 	}
 
 	// Remove `"`, `'` and whitespaces
-	result := strings.Trim(string(body), "\"'\n")
-	if result == fizzbuzz.Fizz || result == fizzbuzz.Buzz || result == fizzbuzz.FizzBuzz {
-		return result, nil
-	} else if _, err := strconv.ParseInt(result, 10, 64); err == nil {
+	respResult := strings.Trim(string(body), "\"'\n")
+	result := ""
+	if respResult == fizzbuzz.Fizz || respResult == fizzbuzz.Buzz || respResult == fizzbuzz.FizzBuzz {
+		result = respResult
+	} else if _, err := strconv.ParseInt(respResult, 10, 64); err == nil {
+		result = respResult
+	}
+
+	if result != "" {
+		o.cacheMu.Lock()
+		o.cache[n] = result
+		o.cacheMu.Unlock()
 		return result, nil
 	}
 	return "", fmt.Errorf("unexpected result: %s", result)
@@ -70,5 +90,6 @@ func NewOracle(opts Options) *Oracle {
 		client: &http.Client{
 			Timeout: timeout,
 		},
+		cache: map[int64]string{},
 	}
 }
