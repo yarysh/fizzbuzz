@@ -2,20 +2,24 @@ package main
 
 import (
 	"fmt"
-	"github.com/yarysh/fizzbuzz/app/fizzbuzz"
-	"github.com/yarysh/fizzbuzz/app/oracle"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/yarysh/fizzbuzz/app/fizzbuzz"
 )
+
+type PredictAPI interface {
+	FizzBuzz(n int64) (string, error)
+}
 
 // App - FizzBuzz application
 // Values in the range [LocalCalcRange[0], LocalCalcRange[1]] (inclusive)
 // will be calculated locally, others will be using Oracle Prediction API.
 type App struct {
-	Oracle         *oracle.Oracle
+	Oracle         PredictAPI
 	LocalCalcRange [2]int64
 }
 

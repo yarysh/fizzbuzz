@@ -6,10 +6,24 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
-
-	"github.com/yarysh/fizzbuzz/app/oracle"
 )
+
+type MockPredictAPI struct{}
+
+func (m *MockPredictAPI) FizzBuzz(n int64) (string, error) {
+	switch strconv.FormatInt(n, 10) {
+	case "-1":
+		return "Buzz", nil
+	case "101":
+		return "FizzBuzz", nil
+	case "150":
+		return "Fizz", nil
+	default:
+		return "", fmt.Errorf("Unexpected request")
+	}
+}
 
 func TestApp_FizzBuzzHandler_bad_request(t *testing.T) {
 	app := App{}
@@ -29,14 +43,8 @@ func TestApp_FizzBuzzHandler_bad_request(t *testing.T) {
 }
 
 func TestApp_FizzBuzzHandler_bad_oracle_responce(t *testing.T) {
-	orcl, mux, teardown := oracle.TestOracle(t)
-	defer teardown()
-	mux.HandleFunc("/predict", func(w http.ResponseWriter, r *http.Request) {
-		defer r.Body.Close()
-		w.WriteHeader(http.StatusInternalServerError)
-	})
 	app := App{
-		Oracle:         orcl,
+		Oracle:         &MockPredictAPI{},
 		LocalCalcRange: [2]int64{0, 10},
 	}
 	w := httptest.NewRecorder()
@@ -55,22 +63,6 @@ func TestApp_FizzBuzzHandler_bad_oracle_responce(t *testing.T) {
 }
 
 func TestApp_FizzBuzzHandler(t *testing.T) {
-	orcl, mux, teardown := oracle.TestOracle(t)
-	defer teardown()
-	mux.HandleFunc("/predict", func(w http.ResponseWriter, r *http.Request) {
-		defer r.Body.Close()
-		body, _ := ioutil.ReadAll(r.Body)
-		switch string(body) {
-		case "-1":
-			fmt.Fprint(w, `"Buzz"`)
-		case "101":
-			fmt.Fprint(w, `"FizzBuzz"`)
-		case "150":
-			fmt.Fprint(w, `"Fizz"`)
-		default:
-			t.Errorf("Unexpected request: %s", string(body))
-		}
-	})
 	tc := map[string]string{
 		"-1":  `"Buzz"`,     // Oracle prediction (wrong result to detect that calculation was done by Oracle)
 		"1":   `"1"`,        // Local calculation
@@ -82,7 +74,7 @@ func TestApp_FizzBuzzHandler(t *testing.T) {
 		"150": `"Fizz"`,     // Oracle prediction (wrong result to detect that calculation was done by Oracle)
 	}
 	app := App{
-		Oracle:         orcl,
+		Oracle:         &MockPredictAPI{},
 		LocalCalcRange: [2]int64{1, 100},
 	}
 	for n, want := range tc {

@@ -2,12 +2,13 @@ package oracle
 
 import (
 	"fmt"
-	"github.com/yarysh/fizzbuzz/app/fizzbuzz"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/yarysh/fizzbuzz/app/fizzbuzz"
 )
 
 // Options for Oracle
